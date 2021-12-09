@@ -55,7 +55,8 @@
                    | {spawn_opt, [term()]} % TODO: more specific typespec
                    | {timeout, timeout()}
                    | {debug, [term()]} % TODO: more specific typespec
-                   | {logger, logi:context()}.
+                   | {logger, logi:context()}
+                   | {initial_shared_state, undefined | term()}.
 %% TODO: doc
 
 -type start_err() :: {already_started, pid()} | timeout | term().

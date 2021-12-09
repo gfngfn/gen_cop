@@ -7,7 +7,7 @@
 %%----------------------------------------------------------------------------------------------------------------------
 %% Exported API
 %%----------------------------------------------------------------------------------------------------------------------
--export([init/3]).
+-export([init/3, init/4]).
 -export([get_socket/1]).
 -export([get_codec/1, set_codec/2]).
 -export([send/2, multisend/2]).
@@ -33,6 +33,7 @@
 
 -export([which_handlers/1]).
 
+-export_type([shared_state/0]).
 -export_type([context/0]).
 -export_type([handler_result/0, handler_result/1]).
 -export_type([position/0]).
@@ -41,12 +42,13 @@
 %%----------------------------------------------------------------------------------------------------------------------
 %% Macros & Records & Types
 %%----------------------------------------------------------------------------------------------------------------------
+-type shared_state() :: term().
+
 -define(CONTEXT, ?MODULE).
 
 -record(?CONTEXT,
         {
-          %% TODO: user_state (connection global state)
-
+          shared_state :: undefined | shared_state(),
           socket :: inet:socket(),
           codec :: gen_cop_codec:codec(),
           handlers = [] :: [gen_cop_handler:handler()], % XXX: non-empty check
@@ -72,7 +74,14 @@
                   {ok, context()} | {stop, Reason} when
       Reason :: {already_present, gen_cop_handler:id()} | term().
 init(Socket, Codec, Handlers) ->
-    Context0 = #?CONTEXT{socket = Socket, codec = Codec},
+    init(Socket, Codec, Handlers, undefined).
+
+-spec init(inet:socket(), gen_cop_codec:codec(), [gen_cop_handler:uninitialized_handler()],
+           undefined | shared_state()) ->
+                  {ok, context()} | {stop, Reason} when
+      Reason :: {already_present, gen_cop_handler:id()} | term().
+init(Socket, Codec, Handlers, SharedState) ->
+    Context0 = #?CONTEXT{shared_state = SharedState, socket = Socket, codec = Codec},
     case handlers_init(lists:reverse(Handlers), Context0) of
         {stop, Reason, Context1} ->
             _ = handlers_terminate(Reason, Context1),

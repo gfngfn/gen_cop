@@ -146,7 +146,8 @@ init(Parent, Name, AckFun, SyncFun, StartArg) when Name =/= undefined ->
     end;
 init(Parent, _, AckFun, SyncFun, {Socket, Codec, Handlers, Options}) ->
     _ = AckFun(),
-    case gen_cop_context:init(Socket, Codec, Handlers) of
+    SharedState = proplists:get_value(initial_shared_state, Options, undefined),
+    case gen_cop_context:init(Socket, Codec, Handlers, SharedState) of
         {stop, Reason} ->
             _ = SyncFun({error, Reason}),
             exit(Reason);
