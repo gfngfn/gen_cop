@@ -33,6 +33,8 @@
 
 -export([which_handlers/1]).
 
+-export([get_shared_state/1, update_shared_state/2]).
+
 -export_type([shared_state/0]).
 -export_type([context/0]).
 -export_type([handler_result/0, handler_result/1]).
@@ -357,6 +359,12 @@ handlers_split(Id, [H | Hs], Acc) ->
         true  -> {ok, lists:reverse(Acc), H, Hs};
         false -> handlers_split(Id, Hs, [H | Acc])
     end.
+
+-spec get_shared_state(context()) -> undefined | shared_state().
+get_shared_state(#?CONTEXT{shared_state = SharedState}) -> SharedState.
+
+-spec update_shared_state(context(), shared_state()) -> context().
+update_shared_state(Context, SharedState) -> Context#?CONTEXT{shared_state = SharedState}.
 
 %%----------------------------------------------------------------------------------------------------------------------
 %% Internal Functions

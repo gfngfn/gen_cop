@@ -56,7 +56,7 @@
                    | {timeout, timeout()}
                    | {debug, [term()]} % TODO: more specific typespec
                    | {logger, logi:context()}
-                   | {initial_shared_state, undefined | term()}.
+                   | {initial_shared_state, undefined | gen_cop_context:shared_state()}.
 %% TODO: doc
 
 -type start_err() :: {already_started, pid()} | timeout | term().
